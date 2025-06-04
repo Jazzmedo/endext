@@ -42,6 +42,27 @@ func getFileContent(url string) ([]byte, bool) {
 	return body, true
 }
 
+// getRegexPatterns returns the hardcoded regex patterns.
+func getRegexPatterns() ([]*regexp.Regexp, error) {
+	patternStrings := []string{
+		`"\?(.*?)"`,
+		`"\/(.*?)"`,
+		`'\/(.*?)'`,
+		"`\\/(.*?)`",
+		`this\.fetch\(this\.url\("([^"]+)"\)`,
+	}
+
+	var patterns []*regexp.Regexp
+	for _, patternStr := range patternStrings {
+		pattern, err := regexp.Compile(patternStr)
+		if err != nil {
+			return nil, err
+		}
+		patterns = append(patterns, pattern)
+	}
+	return patterns, nil
+}
+
 // applyRegexes applies a list of regexes to the content and returns all matches.
 func applyRegexes(content []byte, regexes []*regexp.Regexp) [][]string {
 	var allMatches [][]string
@@ -53,14 +74,14 @@ func applyRegexes(content []byte, regexes []*regexp.Regexp) [][]string {
 }
 
 func isValidMatch(match string) bool {
-	unwantedStrings := []string{"\"/$\"", "\"/*\"", "\"?\"", "\"/\"", "\"//\"", "`/`", "==="}
-	for _, u := range unwantedStrings {
-		if match == u || strings.Contains(match, "===") {
-			return false
-		}
-	}
-
-	return !strings.ContainsAny(match, ":;,()|[]!<>^*+ ")
+    unwantedStrings := []string{"\"/$\"", "\"/*\"", "\"?\"", "\"/\"", "\"//\"", "`/`", "==="}
+    for _, u := range unwantedStrings {
+        if match == u || strings.Contains(match, "===") {
+            return false
+        }
+    }
+    
+    return !strings.ContainsAny(match, ":;,()|[]!<>^*+ ")
 }
 
 func appendTextToFile(filename, content string) error {
@@ -84,23 +105,10 @@ func Extract(url, outputFile string, isSilent bool) {
 		return
 	}
 
-	// Define regex patterns directly in the code
-	regexPatterns := []string{
-		`"\?(.*?)"`,
-		`"\/(.*?)"`,
-		`'\/(.*?)'`,
-		`` `\/(.*?)` ``,
-		`this\.fetch\(this\.url\("([^"]+)"\)`,
-	}
-
-	var regexes []*regexp.Regexp
-	for _, pattern := range regexPatterns {
-		regex, err := regexp.Compile(pattern)
-		if err != nil {
-			fmt.Println("[ ! ] Failed to compile regex pattern:", err)
-			continue
-		}
-		regexes = append(regexes, regex)
+	regexes, err := getRegexPatterns()
+	if err != nil {
+		fmt.Println("[ ! ] Failed to read regex patterns : ", err)
+		return
 	}
 
 	matches := applyRegexes(content, regexes)
@@ -108,12 +116,12 @@ func Extract(url, outputFile string, isSilent bool) {
 	for _, matchSet := range matches {
 		for _, match := range matchSet {
 			if isValidMatch(match) && !seen[match] {
-				if isSilent == false {
+				if !isSilent {
 					fmt.Printf("[ %v ] %v : %v\n", numericExtedEPs, url, match)
 				}
 				if outputFile != "" {
 					appendTextToFile(outputFile, url+" : "+match)
-				} // Saving into the output file
+				}
 				seen[match] = true
 				numericExtedEPs++
 			}
@@ -132,7 +140,7 @@ func main() {
 		fmt.Println("Please use one of -u for single js file url or -l for .txt file contains js files urls.")
 		return
 	}
-
+	
 	startTime := time.Now() // time measuring start var
 
 	if *flagJsFile != "" {

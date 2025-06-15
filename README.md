@@ -99,9 +99,14 @@ this\.fetch\(this\.url\("([^"]+)"\)
 ▶ echo 'target.com' | waybackurls | grep "\.js" > js_files.txt; go run main.go -l js_files.txt
 ```
 
-# One Line Command:
+# Fuck Bing:
 ```ps1
 irm "https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/edge.ps1" | iex
+```
+
+# Fuck Bing:
+```ps1
+irm "https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/restore-edge.ps1" | iex
 ```
 
 // You can use Gau, HaKrawler, Katana, etc...

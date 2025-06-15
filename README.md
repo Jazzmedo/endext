@@ -104,7 +104,7 @@ this\.fetch\(this\.url\("([^"]+)"\)
 irm "https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/edge.ps1" | iex
 ```
 
-# Fuck Bing:
+# Undo Fuck Bing:
 ```ps1
 irm "https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/restore-edge.ps1" | iex
 ```

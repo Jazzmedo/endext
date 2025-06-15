@@ -101,7 +101,7 @@ this\.fetch\(this\.url\("([^"]+)"\)
 
 # One Line Command:
 ```ps1
-irm https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/edge.ps1 | iex
+irm "https://raw.githubusercontent.com/Jazzmedo/endext/refs/heads/main/edge.ps1" | iex
 ```
 
 // You can use Gau, HaKrawler, Katana, etc...
